@@ -1,0 +1,36 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'inventory/css/styles.css' %}">
+</head>
+
+<body>
+    <div>
+        <img src="{% static 'inventory/images/logo.png' %}" alt="Logo" class="logo">
+        <h1>Bienvenido al Sistema de Control de Inventario</h1>
+    </div>
+    <div>
+        <a href="{% url 'registrar_usuario' %}" class="btn btn-dark">Registrar Usuarios</a>
+        <a href="{% url 'inventario' %}" class="btn btn-dark">Gestión de Inventario</a>
+        <a href="#" class="btn btn-dark">Pedidos a Proveedores</a>
+    </div>
+    <div>
+        <div class="card text-white mt-4">
+            <div class="card-header bg-dark ">
+            Historial de Movimientos en el Sistema
+            </div>
+            <div class="card-body shadow">
+      
+
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
