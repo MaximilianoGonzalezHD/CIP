@@ -10,13 +10,13 @@
     <link rel="stylesheet" href="{% static 'inventory/css/styles.css' %}">
 </head>
 
-<body>
+<body class="bg-light text-center">
     <div>
         <img src="{% static 'inventory/images/logo.png' %}" alt="Logo" class="logo">
         <h1>Bienvenido al Sistema de Control de Inventario</h1>
     </div>
     <div>
-        <a href="{% url 'registrar_usuario' %}" class="btn btn-dark">Registrar Usuarios</a>
+        <a href="{% url 'gestion-usuarios' %}" class="btn btn-dark">Administrar Usuarios</a>
         <a href="{% url 'inventario' %}" class="btn btn-dark">Gestión de Inventario</a>
         <a href="#" class="btn btn-dark">Pedidos a Proveedores</a>
     </div>
