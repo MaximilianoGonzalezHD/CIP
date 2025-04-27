@@ -21,3 +21,6 @@ def gestion_usuarios(request):
 def inventario_gestion(request):
     return render(request, 'inventory/gestion/inventario.html')
 
+def pedidos(request):
+    return render(request, 'inventory/gestion/pedidos-proveedor.html')
+
