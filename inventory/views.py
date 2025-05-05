@@ -24,3 +24,11 @@ def inventario_gestion(request):
 def pedidos(request):
     return render(request, 'inventory/gestion/pedidos-proveedor.html')
 
+def material(request):
+    return render(request, 'inventory/gestion/material-usado.html')
+
+def solicitud(request):
+    return render(request, 'inventory/inicio/solicitudes-inventario.html')
+
+def productos_solicitados(request):
+    return render(request, 'inventory/gestion/productos-solicitados.html')
