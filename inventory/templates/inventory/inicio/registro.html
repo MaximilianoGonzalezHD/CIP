@@ -9,27 +9,26 @@
 </head>
 <body class="bg-light text-center">
     <h1 class="mt-5">Registrar Nuevo Usuario</h1>
-
-    <form method="post">
+    <form id="formRegistro" method="post">
         {% csrf_token %}
         <div>
             <label for="rut">RUT:</label><br>
-            <input type="text" id="rut" name="rut" required><br><br>
+            <input placeholder="xx.xxx.xxx-x" type="text" id="rut" name="rut" required><br><br>
         </div>
 
         <div>
             <label for="nombre_primero">Nombre:</label><br>
-            <input type="text" id="nombre_primero" name="nombre_primero" required><br><br>
+            <input placeholder="ingrese nombre.." type="text" id="nombre_primero" name="nombre_primero" required><br><br>
         </div>
 
         <div>
             <label for="apellido">Apellido:</label><br>
-            <input type="text" id="apellido" name="apellido" required><br><br>
+            <input placeholder="ingrese apellido.." type="text" id="apellido" name="apellido" required><br><br>
         </div>
 
         <div>
             <label for="correo">Correo Electrónico:</label><br>
-            <input type="email" id="correo" name="correo" required><br><br>
+            <input placeholder="ingrese correo..." type="email" id="correo" name="correo" required><br><br>
         </div>
 
         <div>
@@ -42,11 +41,13 @@
                 <option value="ventas">Proveedor</option>
             </select><br><br>
         </div>
-
+        <div style="color: red;" id="mensaje"></div>
         <button type="submit" class="button">Registrar</button>
     </form>
 
     <br>
     <a href="{% url 'home' %}" class="button">Volver al Inicio</a>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'inventory/js/validacion-registro-usuario.js' %}"></script>
 </body>
 </html>

@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from .views import inventario_gestion, login, home, material, pedidos, productos_solicitados, registrar_usuario, gestion_usuarios, solicitud
+from .views import agregar_producto, inventario_gestion, login, home, material, pedidos, productos_solicitados, registrar_usuario, gestion_usuarios, solicitud
 
 urlpatterns = [
     path('', login, name='login'),
@@ -28,4 +28,5 @@ urlpatterns = [
     path('material/', material, name='material'),
     path('solicitud/', solicitud, name='solicitud'),
     path('productos-solicitados/', productos_solicitados, name='productos-solicitados'),
+    path('agregar-producto/', agregar_producto, name='agregar-producto'),
 ]

@@ -80,3 +80,18 @@ body {
     justify-content: center;
     
 }
+
+body {
+    background-color: #f8f9fa;
+}
+.form-container {
+    max-width: 500px;
+    margin: auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.form-container h1 {
+    margin-bottom: 20px;
+}

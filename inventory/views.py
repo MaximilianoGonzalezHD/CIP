@@ -32,3 +32,6 @@ def solicitud(request):
 
 def productos_solicitados(request):
     return render(request, 'inventory/gestion/productos-solicitados.html')
+
+def agregar_producto(request):
+    return render(request, 'inventory/gestion/agregar.html')
