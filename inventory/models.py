@@ -11,13 +11,16 @@ class Usuario(AbstractUser):
     # Campos adicionales
     nombre_completo = models.CharField(max_length=100)
     correo = models.EmailField(unique=True)
-    rut = models.CharField(max_length=12, unique=True, null=True, blank=True)
+    rut = models.CharField(max_length=15, unique=True, null=True, blank=True)
+    contrasena = models.CharField(max_length=128)
     rol = models.ForeignKey(Rol, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return f"{self.username} ({self.rol})"
+    
 # Tabla de Productos
 class Producto(models.Model):
+    imagen = models.ImageField(upload_to='static/inventory/images', null=True, blank=True)
     codigo = models.CharField(max_length=20, primary_key=True)
     nombre_producto = models.CharField(max_length=100)
     metros = models.DecimalField(max_digits=10, decimal_places=2)

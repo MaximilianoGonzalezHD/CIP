@@ -17,8 +17,24 @@
     <div class="container d-flex justify-content-center align-items-center">
         <div class="card p-4 shadow" style="width: 22rem;">
             <h2 class="text-center mb-4">Iniciar Sesión</h2>
-            <div id="mensajeLogin"></div>
-    
+            <div  id="mensajeLogin"></div>
+            
+            {% if messages %}
+                <div id="floatingAlertContainer" style="position: fixed; top: 30px; left: 50%; transform: translateX(-50%); z-index: 1050; min-width: 300px;">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow" role="alert" style="color: red;">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+                <script>
+                    setTimeout(function() {
+                        var alertEl = document.getElementById('floatingAlertContainer');
+                        if(alertEl) alertEl.style.display = 'none';
+                    }, 4000);
+                </script>
+            {% endif %}
+
             <form method="post" id="formLogin">
                 {% csrf_token %}
                 <div class="mb-3">
