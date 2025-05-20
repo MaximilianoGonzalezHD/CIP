@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib import messages
-from .models import Rol, Usuario  # Asegúrate de que el modelo Usuario esté definido en models.py
+from .models import Rol, Usuario, Reporte  # Asegúrate de que el modelo Usuario esté definido en models.py
 from django.db import IntegrityError
 import re
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
+from django.db.models import Q
+from django.utils import timezone
 # Create your views here.
 #logueo
 def login(request):
@@ -33,10 +35,32 @@ def login_required_custom(view_func):
             return redirect_to_login(request.get_full_path(), 'login')
         return view_func(request, *args, **kwargs)
     return wrapper
-
 @login_required_custom
 def home(request):
-    return render(request, 'inventory/inicio/home.html')
+    fecha = request.GET.get('fecha', '')
+    responsable_id = request.GET.get('responsable', '')
+
+    reportes = Reporte.objects.all().order_by('-fecha', '-hora')
+
+    if fecha:
+        reportes = reportes.filter(fecha=fecha)
+    if responsable_id:
+        reportes = reportes.filter(usuario_id=responsable_id)
+
+    # Para el filtro de responsables en el select
+    responsables = Usuario.objects.filter(reporte__isnull=False).distinct()
+
+    # Por defecto, muestra solo los últimos 20 si no hay filtros
+    if not fecha and not responsable_id:
+        reportes = reportes[:20]
+
+    context = {
+        'reportes': reportes,
+        'responsables': responsables,
+        'fecha': fecha,
+        'responsable_id': responsable_id,
+    }
+    return render(request, 'inventory/inicio/home.html', context)
 
 #registro
 def registrar_usuario(request):
@@ -59,13 +83,19 @@ def registrar_usuario(request):
         contrasena = rut_numeros[-4:] if len(rut_numeros) >= 4 else rut_numeros
 
         try:
-            Usuario.objects.create_user(
-            username=rut,
-            password=contrasena,
-            nombre_completo=nombre_completo,
-            correo=correo,
-            rut=rut,
-            rol=rol_instance
+            nuevo_usuario = Usuario.objects.create_user(
+                username=rut,
+                password=contrasena,
+                nombre_completo=nombre_completo,
+                correo=correo,
+                rut=rut,
+                rol=rol_instance
+            )
+            Reporte.objects.create(
+                usuario=request.user,
+                descripcion=f"Se añadió a {nuevo_usuario.nombre_completo}, RUT: {nuevo_usuario.rut}, Cargo: {nuevo_usuario.rol}",
+                fecha=timezone.now().date(),
+                hora=timezone.now().time(),
             )
             messages.success(request, 'Usuario registrado exitosamente.')
             return redirect('gestion-usuarios')
@@ -77,7 +107,29 @@ def registrar_usuario(request):
 
 @login_required_custom
 def gestion_usuarios(request):
-    return render(request, 'inventory/gestion/gestion-usuario.html')
+    query = request.GET.get('q', '')
+    usuarios = Usuario.objects.all()
+    # Excluir superusuario (id=1 o is_superuser=True)
+    usuarios = usuarios.exclude(is_superuser=True)
+    if query:
+        usuarios = usuarios.filter(
+            Q(nombre_completo__icontains=query) |
+            Q(rut__icontains=query) |
+            Q(correo__icontains=query)
+        )
+    context = {
+        'usuarios': usuarios
+    }
+    return render(request, 'inventory/gestion/gestion-usuario.html', context)
+
+def eliminar_usuario(request, usuario_id):
+    try:
+        usuario = Usuario.objects.get(pk=usuario_id)
+        usuario.delete()
+        messages.success(request, 'Usuario eliminado correctamente.')
+    except Usuario.DoesNotExist:
+        messages.error(request, 'El usuario no existe.')
+    return redirect('gestion-usuarios')
 
 #inventario
 @login_required_custom

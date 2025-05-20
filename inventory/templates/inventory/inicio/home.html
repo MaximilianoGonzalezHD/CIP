@@ -12,27 +12,124 @@
 
 <body class="bg-light text-center">
     <div>
-        <img src="{% static 'inventory/images/logo.png' %}" alt="Logo" class="logo">
+        <img src="{% static 'inventory/images/Logo.png' %}" alt="Logo" class="logo">
         <h1>Bienvenido al Sistema de Control de Inventario</h1>
     </div>
     <div>
+        {% if request.user.is_superuser %}
+        <!-- Administrador Django: acceso a todo -->
         <a href="{% url 'gestion-usuarios' %}" class="btn btn-dark">Administrar Usuarios</a>
         <a href="{% url 'inventario' %}" class="btn btn-dark">Gestión de Inventario</a>
         <a href="{% url 'material' %}" class="btn btn-dark">Material Utilizado</a>
         <a href="{% url 'pedidos' %}" class="btn btn-dark">Solicitud de Pedidos</a>
         <a href="{% url 'solicitud' %}" class="btn btn-dark">Solicitudes de inventario</a>
+        {% elif request.user.rol and request.user.rol.id == 2 %}
+        <!-- Administrador por rol -->
+        <a href="{% url 'gestion-usuarios' %}" class="btn btn-dark">Administrar Usuarios</a>
+        <a href="{% url 'inventario' %}" class="btn btn-dark">Gestión de Inventario</a>
+        <a href="{% url 'material' %}" class="btn btn-dark">Material Utilizado</a>
+        <a href="{% url 'pedidos' %}" class="btn btn-dark">Solicitud de Pedidos</a>
+        <a href="{% url 'solicitud' %}" class="btn btn-dark">Solicitudes de inventario</a>
+        {% elif request.user.rol.id == 1 %}
+        <!-- Trabajador de inventario -->
+        <a href="{% url 'inventario' %}" class="btn btn-dark">Gestión de Inventario</a>
+        <a href="{% url 'material' %}" class="btn btn-dark">Material Utilizado</a>
+        {% elif request.user.rol.id == 3 %}
+        <!-- Encargado de inventario -->
+        <a href="{% url 'gestion-usuarios' %}" class="btn btn-dark">Administrar Usuarios</a>
+        <a href="{% url 'inventario' %}" class="btn btn-dark">Gestión de Inventario</a>
+        <a href="{% url 'material' %}" class="btn btn-dark">Material Utilizado</a>
+        <a href="{% url 'pedidos' %}" class="btn btn-dark">Solicitud de Pedidos</a>
+        {% elif request.user.rol.id == 4 %}
+        <!-- Encargado de ventas -->
+        <a href="{% url 'solicitud' %}" class="btn btn-dark">Solicitudes de inventario</a>
+        {% endif %}
     </div>
-
     <div>
         <a href="{% url 'logout' %}" class="btn btn-danger mt-3">Cerrar Sesión</a>
-    <div>
+    </div>
 
-        <div class="card text-white mt-4">
-            <div class="card-header bg-dark ">
-            Historial de Movimientos en el Sistema
-            </div>
-            <div class="card-body shadow">
-            </div>
+    <div class="card text-white mt-4 container">
+        <div class="card-header bg-dark">
+            <h5 class="text-center">Historial de movimientos del sistema</h5>
+            {% if request.user.is_superuser %}
+            <form method="get" class="row g-2 justify-content-center mb-3">
+                <!-- Administrador Django: acceso a todo -->
+                <div class="col-auto">
+                    <input type="date" name="fecha" class="form-control" value="{{ fecha }}">
+                </div>
+                <div class="col-auto">
+                    <select name="responsable" class="form-select">
+                        <option value="">Todos los responsables</option>
+                        {% for usuario in responsables %}
+                        {% if usuario.id|stringformat:"s" == responsable_id %}
+                        <option value="{{ usuario.id }}" selected>{{ usuario.nombre_completo }}</option>
+                        {% else %}
+                        <option value="{{ usuario.id }}">{{ usuario.nombre_completo }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                    <a href="{% url 'home' %}" class="btn btn-secondary">Limpiar</a>
+                </div>
+                {% elif request.user.rol and request.user.rol.id == 2 %}
+                <!-- Administrador por rol -->
+                <div class="col-auto">
+                    <input type="date" name="fecha" class="form-control" value="{{ fecha }}">
+                </div>
+                <div class="col-auto">
+                    <select name="responsable" class="form-select">
+                        <option value="">Todos los responsables</option>
+                        {% for usuario in responsables %}
+                        {% if usuario.id|stringformat:"s" == responsable_id %}
+                        <option value="{{ usuario.id }}" selected>{{ usuario.nombre_completo }}</option>
+                        {% else %}
+                        <option value="{{ usuario.id }}">{{ usuario.nombre_completo }}</option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                    <a href="{% url 'home' %}" class="btn btn-secondary">Limpiar</a>
+                </div>
+                {% endif %}
+
+            </form>
+        </div>
+        <div class="card-body shadow ">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Hora</th>
+                        <th>Responsable</th>
+                        <th>Descripción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for reporte in reportes %}
+                    <tr>
+                        <td>{{ reporte.fecha }}</td>
+                        <td>{{ reporte.hora|time:"H:i:s" }}</td>
+                        <td>
+                            {% if reporte.usuario %}
+                            {{ reporte.usuario.nombre_completo }}
+                            {% else %}
+                            Sistema
+                            {% endif %}
+                        </td>
+                        <td>{{ reporte.descripcion }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">No hay movimientos registrados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </body>
