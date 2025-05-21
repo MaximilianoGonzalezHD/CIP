@@ -83,8 +83,8 @@
                 {% for usuario in usuarios %}
                 <tr>
                     <td>{{ usuario.nombre_completo }}</td>
-                    <td>{{ usuario.correo }}</td>
                     <td>{{ usuario.rut }}</td>
+                    <td>{{ usuario.correo }}</td>
                     <td>{{ usuario.rol }}</td>
                     <td>
                         <form action="{% url 'eliminar_usuario' usuario.id %}" method="post" style="display:inline;">

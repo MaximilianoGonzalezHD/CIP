@@ -16,7 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from .views import agregar_producto, eliminar_usuario, inventario_gestion, login, home, logout, material, pedidos, productos_solicitados, registrar_usuario, gestion_usuarios, solicitud
+from .views import agregar_producto, agregar_material_usado, agregar_stock, eliminar_producto, eliminar_usuario, inventario_gestion, login, home, logout, material, pedidos, productos_solicitados, registrar_usuario, gestion_usuarios, solicitud, usar_material
+from . import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', login, name='login'),
@@ -29,6 +32,13 @@ urlpatterns = [
     path('solicitud/', solicitud, name='solicitud'),
     path('productos-solicitados/', productos_solicitados, name='productos-solicitados'),
     path('agregar-producto/', agregar_producto, name='agregar-producto'),
+    path('agregar-material-usado/<str:codigo>/', agregar_material_usado, name='agregar_material_usado'),
     path('logout/', logout, name='logout'),
     path('usuarios/eliminar/<int:usuario_id>/', eliminar_usuario, name='eliminar_usuario'),
+    path('eliminar-producto/<str:codigo>/', eliminar_producto, name='eliminar_producto'),
+    path('usar-material/<int:material_id>/', usar_material, name='usar_material'),
+    path('agregar-stock/<str:codigo>/', agregar_stock, name='agregar_stock'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

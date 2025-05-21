@@ -3,7 +3,7 @@ $(document).ready(function () {
         let valido = true;
 
         $('.text-danger').text('');
-
+        const unidades_producto = $('#unidades_producto').val();
         const nombre = $('#nombre').val().trim();
         const metros = parseFloat($('#metros').val());
         const ancho = parseFloat($('#ancho').val());
@@ -28,30 +28,25 @@ $(document).ready(function () {
             $('#errorNombre').text('El nombre solo puede contener letras, números y espacios.');
             valido = false;
         }
-        if (isNaN(metros) || metros <= 0) {
-            $('#errorMetros').text('Debe ingresar una cantidad válida de metros (> 0).');
-            valido = false;
-        }
         if (metros < 0) {
             $('#errorMetros').text('Los metros no pueden ser negativos.');
             valido = false;
         }
 
-        if (isNaN(ancho) || ancho <= 0) {
-            $('#errorAncho').text('Debe ingresar un ancho válido (> 0).');
-            valido = false;
-        }
+
         if (ancho < 0) {
             $('#errorAncho').text('El ancho no puede ser negativo.');
             valido = false;
         }
 
-        if (isNaN(altura) || altura <= 0) {
-            $('#errorAltura').text('Debe ingresar una altura válida (> 0).');
-            valido = false;
-        }
+
         if (altura < 0) {
             $('#errorAltura').text('La altura no puede ser negativa.');
+            valido = false;
+        }
+
+        if (unidades_producto < 0) {
+            $('#errorUnidades').text('Las unidades no pueden ser negativas.');
             valido = false;
         }
 

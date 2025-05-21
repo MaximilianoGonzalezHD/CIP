@@ -20,14 +20,17 @@ class Usuario(AbstractUser):
     
 # Tabla de Productos
 class Producto(models.Model):
-    imagen = models.ImageField(upload_to='static/inventory/images', null=True, blank=True)
+    imagen = models.ImageField(upload_to='inventory/images', null=True, blank=True)
     codigo = models.CharField(max_length=20, primary_key=True)
     nombre_producto = models.CharField(max_length=100)
     metros = models.DecimalField(max_digits=10, decimal_places=2)
     ancho = models.DecimalField(max_digits=10, decimal_places=2)
+    unidades_producto = models.IntegerField()
     altura = models.DecimalField(max_digits=10, decimal_places=2)
     cantidad = models.IntegerField()
     descripcion = models.TextField()
+    proveedor = models.ForeignKey('Usuario', on_delete=models.SET_NULL, null=True, blank=True, limit_choices_to={'rol__nombre': 'Proveedor'})
+    bodega = models.ForeignKey('Bodega', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return self.nombre_producto
@@ -35,9 +38,15 @@ class Producto(models.Model):
 # Tabla de Material Utilizado
 class MaterialUtilizado(models.Model):
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
-    metros_usados = models.DecimalField(max_digits=10, decimal_places=2)
-    fecha_uso = models.DateField(auto_now_add=True)
-    usuario = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True)
+    cantidad_material = models.PositiveIntegerField(default=1)  # cuántos productos pasaste a material
+    unidades_disponibles = models.PositiveIntegerField(default=0)  # ej: 7 clavos
+    metros_disponibles = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # ej: 8 metros
+    usuario = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, blank=True)
+    fecha = models.DateField(auto_now_add=True)
+    hora = models.TimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.producto.nombre_producto} - {self.cantidad_material} material(es)"
 
 # Tabla de Solicitudes de Pedido
 class SolicitudPedido(models.Model):
@@ -56,3 +65,10 @@ class Reporte(models.Model):
     descripcion = models.TextField()
     fecha = models.DateField(auto_now_add=True)
     hora = models.TimeField(auto_now_add=True)
+
+class Bodega(models.Model):
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.nombre

@@ -116,9 +116,13 @@
                         <td>{{ reporte.hora|time:"H:i:s" }}</td>
                         <td>
                             {% if reporte.usuario %}
-                            {{ reporte.usuario.nombre_completo }}
+                                {% if reporte.usuario.nombre_completo %}
+                                    {{ reporte.usuario.nombre_completo }}
+                                {% else %}
+                                    {{ reporte.usuario.username }}
+                                {% endif %}
                             {% else %}
-                            Sistema
+                                Sistema
                             {% endif %}
                         </td>
                         <td>{{ reporte.descripcion }}</td>

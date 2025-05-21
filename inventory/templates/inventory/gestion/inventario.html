@@ -8,7 +8,18 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
-    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+    $(document).ready(function(){
+        $('#busqueda-producto').on('input', function(){
+            var query = $(this).val();
+            $.get(window.location.pathname, {q: query}, function(data){
+                var nuevaTabla = $(data).find('#tabla-productos').html();
+                $('#tabla-productos').html(nuevaTabla);
+            });
+        });
+    });
+    </script>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -36,7 +47,7 @@
         <h1 class="mb-4">Inventario</h1>
         <div class="text-center mb-3">
             <div class="d-flex">
-                <input type="search" class="form-control me-2 text-center" placeholder="Buscar Producto" style="max-width: 1140px;">
+                <input type="search" id="busqueda-producto" class="form-control me-2 text-center" placeholder="Buscar Producto" style="max-width: 1140px;">
                 <a href="{% url 'agregar-producto' %}" class="btn btn-success">Añadir Producto</a>
             </div>
         </div>
@@ -49,18 +60,57 @@
                         <th>Proveedor</th>
                         <th>Stock</th>
                         <th>Código</th>
+                        <th>Ubicación</th>
                         <th>Eliminar</th>
+                        <th>Añadir Stock</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="tabla-productos">
+                    {% for producto in productos %}
                     <tr>
-                        <td><img src="ruta-de-la-imagen.jpg" alt="Producto" class="img-fluid" style="max-width: 100px;"></td>
-                        <td>Producto 1</td>
-                        <td>Ejemplo proveedor</td>
-                        <td>50</td>
-                        <td>001</td>
-                        <td><button class="btn btn-danger btn-sm">Eliminar</button></td>
+                        <td>
+                            {% if producto.imagen %}
+                                <img src="{{ producto.imagen.url }}" alt="Producto" class="img-fluid" style="max-width: 50px;">
+                            {% else %}
+                                Sin imagen
+                            {% endif %}
+                        </td>
+                        <td>{{ producto.nombre_producto }}</td>
+                        <td>
+                            {% if producto.proveedor %}
+                                {{ producto.proveedor.nombre_completo }}
+                            {% else %}
+                                Sin proveedor
+                            {% endif %}
+                        </td>
+                        <td>{{ producto.cantidad }}</td>
+                        <td>{{ producto.codigo }}</td>
+                        <td>
+                            {% if producto.bodega %}
+                                {{ producto.bodega.nombre }}
+                            {% else %}
+                                Sin ubicación
+                            {% endif %}
+                        </td>
+                        <td>
+                            <form method="post" action="{% url 'eliminar_producto' producto.codigo %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                            </form>
+                        </td>
+                        <td >
+                            <form method="post" action="{% url 'agregar_stock' producto.codigo %}" class="d-flex ">
+                                {% csrf_token %}
+                                <input type="number" name="cantidad" min="1" class="form-control form-control-sm" style="width: 70px;" required>
+                                <button type="submit" class="btn btn-primary btn-sm ms-1">+</button>
+                            </form>
+                        </td>
                     </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8">No hay productos registrados.</td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

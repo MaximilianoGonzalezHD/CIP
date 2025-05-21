@@ -1,20 +1,26 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventario</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js" integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq" crossorigin="anonymous"></script>
-    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-SgOJa3DmI69IUzQ2PVdRZhwQ+dy64/BUtbMJw1MZ8t5HZApcHrRKUc4W0kG879m7" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
+        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -36,8 +42,11 @@
         <h1 class="mb-4">Material</h1>
         <div class="text-center mb-3">
             <div class="d-flex">
-                <input type="search" class="form-control me-2 text-center" placeholder="Buscar Producto" style="max-width: 1140px;">
-                <a href="#" class="btn btn-success">Añadir Material</a>
+                <input type="search" class="form-control me-2 text-center" placeholder="Buscar Producto"
+                    style="max-width: 1140px;">
+                <!-- Botón para abrir el modal -->
+                <a href="#" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalInventario">Añadir
+                    Material</a>
             </div>
         </div>
         <div class="table-responsive">
@@ -46,24 +55,130 @@
                     <tr>
                         <th>Imagen</th>
                         <th>Nombre</th>
-                        <th>Metros Disponibles</th>
-                        <th>Cantidad Disponible</th>
+                        <th>Disponible</th>
                         <th>Código</th>
                         <th>Usar Material</th>
                     </tr>
                 </thead>
                 <tbody>
+                    {% for material in materiales %}
                     <tr>
-                        <td><img src="ruta-de-la-imagen.jpg" alt="Producto" class="img-fluid" style="max-width: 100px;"></td>
-                        <td>Producto 1</td>
-                        <td>8</td>
-                        <td>50</td>
-                        <td>001</td>
-                        <td><button class="btn btn-dark btn-sm">Usar</button></td>
+                        <td>
+                            {% if material.producto.imagen %}
+                                <img src="{{ material.producto.imagen.url }}" alt="Producto" class="img-fluid" style="max-width: 100px;">
+                            {% else %}
+                                Sin imagen
+                            {% endif %}
+                        </td>
+                        <td>{{ material.producto.nombre_producto }}</td>
+                        <td>
+                            {% if material.unidades_disponibles > 0 and material.metros_disponibles > 0 %}
+                                {{ material.unidades_disponibles }} unidades / {{ material.metros_disponibles }} metros
+                            {% elif material.unidades_disponibles > 0 %}
+                                {{ material.unidades_disponibles }} unidades
+                            {% elif material.metros_disponibles > 0 %}
+                                {{ material.metros_disponibles }} metros
+                            {% else %}
+                                Sin material disponible
+                            {% endif %}
+                        </td>
+                        <td>{{ material.producto.codigo }}</td>
+                        <td>
+                            <div class="usar-material-group" data-id="{{ material.id }}"
+                                 data-unidades="{{ material.unidades_disponibles }}"
+                                 data-metros="{{ material.metros_disponibles }}">
+                                <button class="btn btn-dark btn-sm btn-usar-material" type="button">Usar</button>
+                            </div>
+                        </td>
                     </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">No hay materiales registrados.</td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
     </div>
+
+    <!-- Modal Bootstrap -->
+    <div class="modal fade" id="modalInventario" tabindex="-1" aria-labelledby="modalInventarioLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalInventarioLabel">Seleccionar Producto del Inventario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Imagen</th>
+                                    <th>Nombre</th>
+                                    <th>Metros</th>
+                                    <th>Unidades</th>
+                                    <th>Stock</th>
+                                    <th>Código</th>
+                                    <th>Agregar</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for producto in productos %}
+                                <tr>
+                                    <td>
+                                        {% if producto.imagen %}
+                                        <img src="{{ producto.imagen.url }}" alt="Producto" class="img-fluid"
+                                            style="max-width: 50px;">
+                                        {% else %}
+                                        Sin imagen
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ producto.nombre_producto }}</td>
+                                    <td>{{ producto.metros }}</td>
+                                    <td>{{ producto.unidades_producto }}</td>
+                                    <td>{{ producto.cantidad }}</td>
+                                    <td>{{ producto.codigo }}</td>
+                                    <td>
+                                        <form method="post" action="{% url 'agregar_material_usado' producto.codigo %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-primary btn-sm">Añadir</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7">No hay productos en inventario.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(function () {
+            $('.table').on('click', '.btn-usar-material', function () {
+                var $group = $(this).closest('.usar-material-group');
+                var id = $group.data('id');
+                var unidades = parseInt($group.data('unidades'));
+                var metros = parseFloat($group.data('metros'));
+                let html = `<form method="post" action="/usar-material/${id}/" class="d-flex gap-1">{% csrf_token %}`;
+                if (unidades > 0) {
+                    html += `<input type="number" name="usar_unidades" min="1" max="${unidades}" placeholder="Unidades" class="form-control form-control-sm" style="width:80px;">`;
+                }
+                if (metros > 0) {
+                    html += `<input type="number" name="usar_metros" min="0.01" step="0.01" max="${metros}" placeholder="Metros" class="form-control form-control-sm" style="width:80px;">`;
+                }
+                html += `<button type="submit" class="btn btn-success btn-sm">OK</button></form>`;
+                $group.html(html);
+            });
+        });
+    </script>
 </body>
+
 </html>
