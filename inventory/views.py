@@ -9,6 +9,7 @@ from django.contrib.auth.views import redirect_to_login
 from django.db.models import Q
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from decimal import Decimal
 
 # Create your views here.
 #logueo
@@ -247,7 +248,6 @@ def agregar_material_usado(request, codigo):
         if producto.cantidad > 0:
             producto.cantidad -= 1
             producto.save()
-            # Crea un nuevo material utilizado con los datos del producto
             MaterialUtilizado.objects.create(
                 producto=producto,
                 cantidad_material=1,
@@ -255,6 +255,22 @@ def agregar_material_usado(request, codigo):
                 metros_disponibles=producto.metros,
                 usuario=request.user
             )
+            # Reporte: Saco x producto del inventario
+            Reporte.objects.create(
+                usuario=request.user,
+                descripcion=f"Sacó {producto.nombre_producto} del inventario para usarlo como material.",
+                fecha=timezone.now().date(),
+                hora=timezone.now().time(),
+            )
+            # NUEVO: Reporte si el producto queda sin stock
+            if producto.cantidad == 0:
+                usuario_sistema = Usuario.objects.filter(username='sistema').first()
+                Reporte.objects.create(
+                    usuario=usuario_sistema,
+                    descripcion=f"{producto.nombre_producto} se ha quedado sin stock.",
+                    fecha=timezone.now().date(),
+                    hora=timezone.now().time(),
+                )
             messages.success(request, "Material añadido correctamente.")
         else:
             messages.error(request, "No hay stock disponible para este producto.")
@@ -266,15 +282,23 @@ def agregar_material_usado(request, codigo):
 def usar_material(request, material_id):
     material = get_object_or_404(MaterialUtilizado, id=material_id)
     unidades_usar = int(request.POST.get('usar_unidades', 0) or 0)
-    metros_usar = float(request.POST.get('usar_metros', 0) or 0)
+    metros_usar = request.POST.get('usar_metros', 0) or 0
+    try:
+        metros_usar = Decimal(metros_usar)
+    except:
+        metros_usar = Decimal(0)
     changed = False
+    descripcion_reporte = ""
 
     if unidades_usar > 0 and material.unidades_disponibles >= unidades_usar:
         material.unidades_disponibles -= unidades_usar
         changed = True
+        descripcion_reporte += f"Se usó {unidades_usar} unidad(es) de '{material.producto.nombre_producto}'. "
+
     if metros_usar > 0 and material.metros_disponibles >= metros_usar:
         material.metros_disponibles -= metros_usar
         changed = True
+        descripcion_reporte += f"Se usó {metros_usar} metros de '{material.producto.nombre_producto}'. "
 
     if changed:
         # Si ambos llegan a 0, elimina el material utilizado
@@ -282,6 +306,13 @@ def usar_material(request, material_id):
             material.delete()
         else:
             material.save()
+        # Crear el reporte solo si se usó algo
+        Reporte.objects.create(
+            usuario=request.user,
+            descripcion=descripcion_reporte.strip(),
+            fecha=timezone.now().date(),
+            hora=timezone.now().time(),
+        )
     return redirect('material')
 
 def logout(request):

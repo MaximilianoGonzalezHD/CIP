@@ -42,7 +42,7 @@
         <h1 class="mb-4">Material</h1>
         <div class="text-center mb-3">
             <div class="d-flex">
-                <input type="search" class="form-control me-2 text-center" placeholder="Buscar Producto"
+                <input type="search" id="filtro-material" class="form-control me-2 text-center" placeholder="Buscar Producto"
                     style="max-width: 1140px;">
                 <!-- Botón para abrir el modal -->
                 <a href="#" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalInventario">Añadir
@@ -161,7 +161,19 @@
     </div>
 
     <script>
+        // Filtro en tiempo real para la tabla de materiales usados
         $(function () {
+            $('#filtro-material').on('keyup', function () {
+                var value = $(this).val().toLowerCase();
+                $('.table tbody tr').filter(function () {
+                    // Busca por nombre o código
+                    var nombre = $(this).find('td:eq(1)').text().toLowerCase();
+                    var codigo = $(this).find('td:eq(3)').text().toLowerCase();
+                    $(this).toggle(nombre.includes(value) || codigo.includes(value));
+                });
+            });
+
+            // Botón usar material (ya lo tienes)
             $('.table').on('click', '.btn-usar-material', function () {
                 var $group = $(this).closest('.usar-material-group');
                 var id = $group.data('id');
