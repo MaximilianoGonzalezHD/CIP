@@ -20,21 +20,29 @@
                     </tr>
                 </thead>
                 <tbody>
+                    {% for solicitud in solicitudes %}
                     <tr>
-                        <td>2023-10-01</td>
-                        <td>Juan Pérez</td>
-                        <td><a href="{% url 'productos-solicitados' %}" class="btn btn-primary btn-sm">Abrir</a></td>
+                        <td>{{ solicitud.fecha|date:"Y-m-d" }}</td>
+                        <td>
+                            {% if solicitud.responsable %}
+                                {{ solicitud.responsable.nombre_completo }}
+                            {% else %}
+                                Sin responsable
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'productos-solicitados' solicitud.id %}" class="btn btn-primary btn-sm">Abrir</a>
+                            <form method="post" action="{% url 'eliminar_solicitud' solicitud.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-sm" title="Confirmar pedido">&#10003;</button>
+                            </form>
+                        </td>
                     </tr>
+                    {% empty %}
                     <tr>
-                        <td>2023-10-02</td>
-                        <td>María López</td>
-                        <td><a href="{% url 'productos-solicitados' %}" class="btn btn-primary btn-sm">Abrir</a></td>
+                        <td colspan="3" class="text-center">No hay pedidos registrados.</td>
                     </tr>
-                    <tr>
-                        <td>2023-10-03</td>
-                        <td>Carlos García</td>
-                        <td><a href="{% url 'productos-solicitados' %}" class="btn btn-primary btn-sm">Abrir</a></td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

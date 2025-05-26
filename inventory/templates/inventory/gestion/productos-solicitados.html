@@ -9,31 +9,24 @@
 <body>
     <div class="container my-5">
         <h1 class="text-center mb-4">Productos Solicitados</h1>
+        <h2>Productos solicitados para el pedido #{{ solicitud.id }}</h2>
         <div class="table-responsive">
             <table class="table table-bordered table-striped">
                 <thead class="table-dark">
                     <tr>
-                        <th scope="col">Imagen</th>
+                        <th scope="col">Código</th>
                         <th scope="col">Nombre</th>
                         <th scope="col">Cantidad</th>
                     </tr>
                 </thead>
                 <tbody>
+                    {% for detalle in detalles %}
                     <tr>
-                        <td><img src="https://via.placeholder.com/50" alt="Producto" class="img-fluid"></td>
-                        <td>Producto 1</td>
-                        <td>10</td>
+                        <td>{{ detalle.producto.codigo }}</td>
+                        <td>{{ detalle.producto.nombre_producto }}</td>
+                        <td>{{ detalle.cantidad }}</td>
                     </tr>
-                    <tr>
-                        <td><img src="https://via.placeholder.com/50" alt="Producto" class="img-fluid"></td>
-                        <td>Producto 2</td>
-                        <td>5</td>
-                    </tr>
-                    <tr>
-                        <td><img src="https://via.placeholder.com/50" alt="Producto" class="img-fluid"></td>
-                        <td>Producto 3</td>
-                        <td>8</td>
-                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>

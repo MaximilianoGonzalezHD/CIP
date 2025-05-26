@@ -1,5 +1,5 @@
 $(document).ready(function () {
-    $('#formagregar').on('submit', function (e) {
+    $('#formAgregarProducto').on('submit', function (e) {
         let valido = true;
 
         $('.text-danger').text('');

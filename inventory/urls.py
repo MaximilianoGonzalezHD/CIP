@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from .views import agregar_producto, agregar_material_usado, agregar_stock, eliminar_producto, eliminar_usuario, inventario_gestion, login, home, logout, material, pedidos, productos_solicitados, registrar_usuario, gestion_usuarios, solicitud, usar_material
+from .views import agregar_producto, agregar_material_usado, agregar_stock, crear_pedido, eliminar_producto, eliminar_solicitud, eliminar_usuario, inventario_gestion, login, home, logout, material, pedidos, productos_solicitados, registrar_usuario, gestion_usuarios, solicitud, usar_material
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -30,7 +30,7 @@ urlpatterns = [
     path('pedidos/', pedidos, name='pedidos'),
     path('material/', material, name='material'),
     path('solicitud/', solicitud, name='solicitud'),
-    path('productos-solicitados/', productos_solicitados, name='productos-solicitados'),
+     path('productos-solicitados/<int:solicitud_id>/', productos_solicitados, name='productos-solicitados'),
     path('agregar-producto/', agregar_producto, name='agregar-producto'),
     path('agregar-material-usado/<str:codigo>/', agregar_material_usado, name='agregar_material_usado'),
     path('logout/', logout, name='logout'),
@@ -38,6 +38,8 @@ urlpatterns = [
     path('eliminar-producto/<str:codigo>/', eliminar_producto, name='eliminar_producto'),
     path('usar-material/<int:material_id>/', usar_material, name='usar_material'),
     path('agregar-stock/<str:codigo>/', agregar_stock, name='agregar_stock'),
+    path('crear-pedido/', crear_pedido, name='crear_pedido'),
+    path('eliminar-solicitud/<int:solicitud_id>/', eliminar_solicitud, name='eliminar_solicitud'),
 ]
 
 if settings.DEBUG:

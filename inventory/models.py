@@ -50,7 +50,8 @@ class MaterialUtilizado(models.Model):
 
 # Tabla de Solicitudes de Pedido
 class SolicitudPedido(models.Model):
-    proveedor = models.ForeignKey(Usuario, on_delete=models.CASCADE, limit_choices_to={'rol__nombre': 'Proveedor'})
+    proveedor = models.ForeignKey(Usuario, related_name='solicitudes_proveedor', on_delete=models.SET_NULL, null=True, blank=True)
+    responsable = models.ForeignKey(Usuario, related_name='solicitudes_responsable', on_delete=models.SET_NULL, null=True, blank=True)
     fecha = models.DateField(auto_now_add=True)
 
 # Detalles de la solicitud (relación muchos-a-muchos)

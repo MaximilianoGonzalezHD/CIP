@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib import messages
-from .models import Rol, Usuario, Reporte, Bodega, Producto, MaterialUtilizado  # Asegúrate de que el modelo Usuario esté definido en models.py
+from .models import Rol, Usuario, Reporte, Bodega, Producto, MaterialUtilizado, SolicitudPedido, DetalleSolicitud  # Asegúrate de que el modelo Usuario esté definido en models.py
 from django.db import IntegrityError
 import re
 from django.contrib.auth.decorators import login_required
@@ -149,7 +149,41 @@ def inventario_gestion(request):
 
 @login_required_custom
 def pedidos(request):
-    return render(request, 'inventory/gestion/pedidos-proveedor.html')
+    if 'pedido' not in request.session:
+        request.session['pedido'] = []
+
+    if request.method == 'POST':
+        print("POST recibido")  # <-- Esto debe aparecer en la consola
+        codigo = request.POST.get('codigoProducto')
+        cantidad = int(request.POST.get('cantidad', 0))
+        try:
+            producto = Producto.objects.get(codigo=codigo)
+            pedido = request.session['pedido']
+            for item in pedido:
+                if item['codigo'] == codigo:
+                    item['cantidad'] += cantidad
+                    break
+            else:
+                pedido.append({
+                    'codigo': producto.codigo,
+                    'descripcion': producto.nombre_producto,
+                    'cantidad': cantidad
+                })
+            request.session['pedido'] = pedido
+            request.session.modified = True
+        except Producto.DoesNotExist:
+            messages.error(request, "El producto no existe.")
+
+    if request.GET.get('eliminar'):
+        codigo = request.GET.get('eliminar')
+        pedido = request.session.get('pedido', [])
+        pedido = [item for item in pedido if item['codigo'] != codigo]
+        request.session['pedido'] = pedido
+        request.session.modified = True
+        return redirect('pedidos')
+
+    productos = request.session.get('pedido', [])
+    return render(request, 'inventory/gestion/pedidos-proveedor.html', {'productos': productos})
 
 @login_required_custom
 def material(request):
@@ -162,11 +196,21 @@ def material(request):
 
 @login_required_custom
 def solicitud(request):
-    return render(request, 'inventory/inicio/solicitudes-inventario.html')
+    solicitudes = SolicitudPedido.objects.select_related('proveedor').order_by('-fecha')
+    return render(request, 'inventory/inicio/solicitudes-inventario.html', {'solicitudes': solicitudes})
 
 @login_required_custom
-def productos_solicitados(request):
-    return render(request, 'inventory/gestion/productos-solicitados.html')
+def productos_solicitados(request, solicitud_id):
+    solicitud = get_object_or_404(SolicitudPedido, id=solicitud_id)
+    detalles = DetalleSolicitud.objects.filter(solicitud=solicitud).select_related('producto')
+    return render(
+        request,
+        'inventory/gestion/productos-solicitados.html',
+        {
+            'solicitud': solicitud,
+            'detalles': detalles,
+        }
+    )
 
 @login_required_custom
 def agregar_producto(request):
@@ -331,3 +375,50 @@ def agregar_stock(request, codigo):
         else:
             messages.error(request, "Cantidad inválida.")
     return redirect('inventario')
+
+@login_required_custom
+def crear_pedido(request):
+    if request.method == 'POST':
+        pedido = request.session.get('pedido', [])
+        if not pedido:
+            messages.error(request, "No hay productos en el pedido.")
+            return redirect('pedidos')
+        proveedor = Usuario.objects.filter(rol__nombre='Proveedor').first()
+        solicitud = SolicitudPedido.objects.create(
+            proveedor=proveedor,
+            responsable=request.user
+        )
+        for item in pedido:
+            producto = Producto.objects.get(codigo=item['codigo'])
+            DetalleSolicitud.objects.create(
+                solicitud=solicitud,
+                producto=producto,
+                cantidad=item['cantidad']
+            )
+        # --- REPORTE ---
+        Reporte.objects.create(
+            usuario=request.user,
+            descripcion=f"Se ha creado un pedido (ID: {solicitud.id}).",
+            fecha=timezone.now().date(),
+            hora=timezone.now().time(),
+        )
+        request.session['pedido'] = []
+        messages.success(request, "Pedido creado correctamente.")
+        return redirect('pedidos')
+    return redirect('pedidos')
+
+@login_required_custom
+def eliminar_solicitud(request, solicitud_id):
+    solicitud = get_object_or_404(SolicitudPedido, id=solicitud_id)
+    solicitud_id = solicitud.id
+    responsable = solicitud.responsable
+    solicitud.delete()
+    # --- REPORTE ---
+    Reporte.objects.create(
+        usuario=request.user,
+        descripcion=f"Pedido realizado con exito por (ID: {solicitud_id}).",
+        fecha=timezone.now().date(),
+        hora=timezone.now().time(),
+    )
+    messages.success(request, "Pedido confirmado y eliminado.")
+    return redirect('solicitud')
