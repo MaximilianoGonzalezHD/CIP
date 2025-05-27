@@ -16,28 +16,16 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
+    
+    <a href="{% url 'home' %}" class="btn btn-outline-primary position-absolute m-3" style="top:0; left:0; z-index:10;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-house-door"
+            viewBox="0 0 16 16">
+            <path
+                d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 2 7.5V14a1 1 0 0 0 1 1h3.5a.5.5 0 0 0 .5-.5V11a.5.5 0 0 1 .5-.5h1a.5.5 0 0 1 .5.5v3.5a.5.5 0 0 0 .5.5H13a1 1 0 0 0 1-1V7.5a.5.5 0 0 0-.146-.354l-6-6z" />
+            <path d="M13 2.5V6l-5-5-5 5V2.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 .5.5z" />
+        </svg>
+    </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'inventario' %}">Inventario</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Pedidos</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
     <div class="container text-center mt-5">
         <h1 class="mb-4">Material</h1>
         <div class="text-center mb-3">

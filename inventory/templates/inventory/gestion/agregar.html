@@ -12,30 +12,38 @@
         body {
             background: #f8f9fa;
         }
+
         .card {
             width: 22rem;
             padding: 1.2rem 1rem;
         }
+
         .form-label {
             font-size: 0.95rem;
             margin-bottom: 0.2rem;
         }
-        .form-control, .form-select {
+
+        .form-control,
+        .form-select {
             font-size: 0.95rem;
             padding: 0.25rem 0.5rem;
             height: 2rem;
         }
+
         .mb-3 {
             margin-bottom: 0.7rem !important;
         }
+
         h2 {
             font-size: 1.3rem;
             margin-bottom: 1rem !important;
         }
+
         button[type="submit"] {
             padding: 0.4rem 0;
             font-size: 1rem;
         }
+
         .text-danger {
             font-size: 0.8rem;
             margin-top: 0.1rem;
@@ -44,6 +52,16 @@
 </head>
 
 <body class="d-flex justify-content-center align-items-center vh-100">
+
+    <a href="javascript:history.back()" class="btn btn-outline-secondary position-absolute m-3"
+        style="top:0; left:0; z-index:10;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-arrow-left"
+            viewBox="0 0 16 16">
+            <path fill-rule="evenodd"
+                d="M15 8a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 0 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 7.5H14.5A.5.5 0 0 1 15 8z" />
+        </svg>
+    </a>
+
     <div class="card shadow">
         <h2 class="text-center mb-3">Añadir Producto</h2>
         <div class="form-container">
@@ -91,7 +109,8 @@
                 </div>
                 <div class="mb-3">
                     <label for="descripcion" class="form-label">Descripción:</label>
-                    <textarea id="descripcion" name="descripcion" class="form-control" rows="2" required style="resize: none;"></textarea>
+                    <textarea id="descripcion" name="descripcion" class="form-control" rows="2" required
+                        style="resize: none;"></textarea>
                     <div class="text-danger" id="errorDescripcion"></div>
                 </div>
                 <div class="mb-3">
@@ -99,7 +118,7 @@
                     <select id="proveedor" name="proveedor" class="form-select" required>
                         <option value="">Seleccione un proveedor</option>
                         {% for proveedor in proveedores %}
-                            <option value="{{ proveedor.id }}">{{ proveedor.nombre_completo }}</option>
+                        <option value="{{ proveedor.id }}">{{ proveedor.nombre_completo }}</option>
                         {% endfor %}
                     </select>
                     <div class="text-danger" id="errorProveedor"></div>
@@ -109,7 +128,7 @@
                     <select id="bodega" name="bodega" class="form-select" required>
                         <option value="">Seleccione una bodega</option>
                         {% for bodega in bodegas %}
-                            <option value="{{ bodega.id }}">{{ bodega.nombre }}</option>
+                        <option value="{{ bodega.id }}">{{ bodega.nombre }}</option>
                         {% endfor %}
                     </select>
                     <div class="text-danger" id="errorBodega"></div>
@@ -122,5 +141,5 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{% static 'inventory/js/validacion-agregar.js' %}"></script>
 </body>
-</html>
 
+</html>
