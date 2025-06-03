@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from .views import agregar_producto, agregar_material_usado, agregar_stock, crear_pedido, eliminar_producto, eliminar_solicitud, eliminar_usuario, inventario_gestion, login, home, logout, material, pedidos, productos_solicitados, registrar_usuario, gestion_usuarios, solicitud, usar_material
+from .views import agregar_producto, agregar_material_usado, agregar_stock, crear_pedido, eliminar_producto, eliminar_solicitud, eliminar_usuario, inventario_gestion, login, home, logout, material, pedidos, productos_solicitados, registrar_usuario, gestion_usuarios, solicitud, solicitudes_archivadas, usar_material, ver_solicitud_archivada
 from . import views
 from django.conf import settings
 from django.conf.urls.static import static
@@ -40,6 +40,8 @@ urlpatterns = [
     path('agregar-stock/<str:codigo>/', agregar_stock, name='agregar_stock'),
     path('crear-pedido/', crear_pedido, name='crear_pedido'),
     path('eliminar-solicitud/<int:solicitud_id>/', eliminar_solicitud, name='eliminar_solicitud'),
+    path('solicitudes-archivadas/', solicitudes_archivadas, name='solicitudes_archivadas'),
+    path('solicitud_archivada/<int:solicitud_id>/', ver_solicitud_archivada, name='ver_solicitud_archivada'),
 ]
 
 if settings.DEBUG:

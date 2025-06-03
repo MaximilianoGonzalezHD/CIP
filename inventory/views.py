@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib import messages
-from .models import Rol, Usuario, Reporte, Bodega, Producto, MaterialUtilizado, SolicitudPedido, DetalleSolicitud  # Asegúrate de que el modelo Usuario esté definido en models.py
+from .models import DetalleSolicitudArchivada, Rol, SolicitudArchivada, Usuario, Reporte, Bodega, Producto, MaterialUtilizado, SolicitudPedido, DetalleSolicitud  # Asegúrate de que el modelo Usuario esté definido en models.py
 from django.db import IntegrityError
 import re
 from django.contrib.auth.decorators import login_required
@@ -408,17 +408,48 @@ def crear_pedido(request):
     return redirect('pedidos')
 
 @login_required_custom
+def solicitudes_archivadas(request):
+    solicitudes = SolicitudArchivada.objects.all()
+    return render(request, 'inventory/inicio/solicitudes_archivadas.html', {'solicitudes': solicitudes})
+
+@login_required_custom
+def ver_solicitud_archivada(request, solicitud_id):
+    solicitud = get_object_or_404(SolicitudArchivada, id=solicitud_id)
+    detalles = solicitud.detalles.all()  # gracias al related_name='detalles'
+    return render(request, 'inventory/gestion/detalles_solicitudes.html', {
+        'solicitud': solicitud,
+        'detalles': detalles
+    })
+
+@login_required_custom
 def eliminar_solicitud(request, solicitud_id):
     solicitud = get_object_or_404(SolicitudPedido, id=solicitud_id)
-    solicitud_id = solicitud.id
-    responsable = solicitud.responsable
+
+    # 1. Crear la solicitud archivada
+    solicitud_archivada = SolicitudArchivada.objects.create(
+        proveedor=solicitud.proveedor,
+        responsable=solicitud.responsable,
+        fecha=solicitud.fecha
+    )
+
+    # 2. Traspasar los detalles a DetalleSolicitudArchivada
+    detalles = DetalleSolicitud.objects.filter(solicitud=solicitud)
+    for detalle in detalles:
+        DetalleSolicitudArchivada.objects.create(
+            solicitud_archivada=solicitud_archivada,
+            producto=detalle.producto,
+            cantidad=detalle.cantidad
+        )
+
     solicitud.delete()
-    # --- REPORTE ---
+
+    # 3. Reporte
     Reporte.objects.create(
         usuario=request.user,
-        descripcion=f"Pedido realizado con exito por (ID: {solicitud_id}).",
+        descripcion=f"Solicitud archivada (ID: {solicitud_id}) con todos sus productos.",
         fecha=timezone.now().date(),
         hora=timezone.now().time(),
     )
-    messages.success(request, "Pedido confirmado y eliminado.")
+
+    messages.success(request, "Solicitud archivada correctamente.")
     return redirect('solicitud')

@@ -23,6 +23,7 @@
         <a href="{% url 'material' %}" class="btn btn-dark">Material Utilizado</a>
         <a href="{% url 'pedidos' %}" class="btn btn-dark">Solicitud de Pedidos</a>
         <a href="{% url 'solicitud' %}" class="btn btn-dark">Solicitudes de inventario</a>
+        <a href="{% url 'solicitudes_archivadas' %}" class="btn btn-dark">Pedidos hechos</a>
         {% elif request.user.rol and request.user.rol.id == 2 %}
         <!-- Administrador por rol -->
         <a href="{% url 'gestion-usuarios' %}" class="btn btn-dark">Administrar Usuarios</a>
@@ -30,19 +31,20 @@
         <a href="{% url 'material' %}" class="btn btn-dark">Material Utilizado</a>
         <a href="{% url 'pedidos' %}" class="btn btn-dark">Solicitud de Pedidos</a>
         <a href="{% url 'solicitud' %}" class="btn btn-dark">Solicitudes de inventario</a>
+        <a href="{% url 'solicitudes_archivadas' %}" class="btn btn-dark">Pedidos hechos</a>
         {% elif request.user.rol.id == 1 %}
         <!-- Trabajador de inventario -->
         <a href="{% url 'inventario' %}" class="btn btn-dark">Gestión de Inventario</a>
         <a href="{% url 'material' %}" class="btn btn-dark">Material Utilizado</a>
         {% elif request.user.rol.id == 3 %}
         <!-- Encargado de inventario -->
-        <a href="{% url 'gestion-usuarios' %}" class="btn btn-dark">Administrar Usuarios</a>
         <a href="{% url 'inventario' %}" class="btn btn-dark">Gestión de Inventario</a>
         <a href="{% url 'material' %}" class="btn btn-dark">Material Utilizado</a>
         <a href="{% url 'pedidos' %}" class="btn btn-dark">Solicitud de Pedidos</a>
         {% elif request.user.rol.id == 4 %}
         <!-- Encargado de ventas -->
         <a href="{% url 'solicitud' %}" class="btn btn-dark">Solicitudes de inventario</a>
+         <a href="{% url 'solicitudes_archivadas' %}" class="btn btn-dark">Pedidos hechos</a>
         {% endif %}
     </div>
     <div>

@@ -54,11 +54,28 @@ class SolicitudPedido(models.Model):
     responsable = models.ForeignKey(Usuario, related_name='solicitudes_responsable', on_delete=models.SET_NULL, null=True, blank=True)
     fecha = models.DateField(auto_now_add=True)
 
+class SolicitudArchivada(models.Model):
+    proveedor = models.ForeignKey(Usuario, related_name='archivadas_proveedor', on_delete=models.SET_NULL, null=True, blank=True)
+    responsable = models.ForeignKey(Usuario, related_name='archivadas_responsable', on_delete=models.SET_NULL, null=True, blank=True)
+    fecha = models.DateField()
+    fecha_archivado = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Solicitud archivada por {self.responsable} el {self.fecha_archivado}"
+    
 # Detalles de la solicitud (relación muchos-a-muchos)
 class DetalleSolicitud(models.Model):
     solicitud = models.ForeignKey(SolicitudPedido, on_delete=models.CASCADE)
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
     cantidad = models.IntegerField()
+
+class DetalleSolicitudArchivada(models.Model):
+    solicitud_archivada = models.ForeignKey('SolicitudArchivada', on_delete=models.CASCADE, related_name='detalles')
+    producto = models.ForeignKey(Producto, on_delete=models.SET_NULL, null=True)
+    cantidad = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.producto} x {self.cantidad}"
 
 # Reportes
 class Reporte(models.Model):
